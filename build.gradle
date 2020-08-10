@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 plugins {
     id 'groovy'
     id 'java'
@@ -10,7 +13,69 @@ repositories {
     mavenCentral()
 }
 
+configurations { conf }
+
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    conf 'org.codehaus.groovy:groovy-all:2.3.11'
+    implementation 'org.codehaus.groovy:groovy-all:2.3.11'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+task hello {
+    doLast {
+        println 'Hello world!'
+    }
+}
+
+task cleanSampleCopy {
+    doLast {
+        def path = Paths.get('build/tmp/sampleCopy/SampleFile.txt')
+        if (Files.exists(path)) {
+            Files.delete(path)
+        }
+    }
+}
+
+task sampleCopy(type: Sync) {
+    description 'This is a sample copy task'
+    group 'Sample Group'
+    dependsOn cleanSampleCopy
+
+    from './SampleFile.txt'
+    into 'build/tmp/sampleCopy'
+
+    // Below line will be printed in configuration phase
+    println "This line will be printed in configuration phase"
+
+    // println in doFirst and doLast will be executed in execution phase.
+    doFirst {
+        if (Files.exists(Paths.get('build/tmp/sampleCopy/SampleFile.txt'))) {
+            println "File already exists when doFirst is executing"
+        } else {
+            println "File does NOT exists when doFirst is executing"
+        }
+    }
+
+    doLast {
+        if (Files.exists(Paths.get('build/tmp/sampleCopy/SampleFile.txt'))) {
+            println "File already exists when doLast is executing"
+        } else {
+            println "File does NOT exists when doLast is executing"
+        }
+    }
+}
+
+class GreetingTask extends DefaultTask {
+    @Input
+    String greeting = 'hello from GreetingTask'
+
+    @TaskAction
+    def greet() {
+        println greeting
+    }
+}
+
+// Create a task using the task type
+task greetTask(type: GreetingTask) {
+    greeting = 'greetings from GreetingTask'
 }

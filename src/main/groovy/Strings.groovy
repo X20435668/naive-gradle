@@ -8,7 +8,8 @@ lint 3
 String e = """
 multi line GString ${1+4}
 """
+
 // patten
 String f = /[0-9]*/
 
-
+println f

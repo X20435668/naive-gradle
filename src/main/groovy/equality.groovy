@@ -1,5 +1,7 @@
 String a = "5"
 int b = 5
-String c = "${b}"
+def c = "${b}"
+assert c.getClass() in GString
+assert a.getClass() in String
 println c == a
 
